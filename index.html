@@ -1094,7 +1094,7 @@ footer {
 
 /* ══════════════════════════════════════
    DATABASE  (empty — no demo data)
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
 let DB = {
   products:   [],
   sales:      [],
@@ -1107,8 +1107,40 @@ let DB = {
 };
 
 /* ══════════════════════════════════════
+   LOCALSTORAGE PERSISTENCE
+ ══════════════════════════════════════ */
+const STORAGE_KEY = 'olixStockDB';
+
+function saveDB() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  } catch (e) {
+    console.error('Failed to save DB:', e);
+  }
+}
+
+function loadDB() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      DB.products   = parsed.products   || [];
+      DB.sales      = parsed.sales      || [];
+      DB.buys       = parsed.buys       || [];
+      DB.recyclebin = parsed.recyclebin || [];
+      DB._nextSaleId     = parsed._nextSaleId     || 1;
+      DB._nextProductId  = parsed._nextProductId  || 1;
+      DB._nextBuyId      = parsed._nextBuyId      || 1;
+      DB._nextRecycleId  = parsed._nextRecycleId  || 1;
+    }
+  } catch (e) {
+    console.error('Failed to load DB:', e);
+  }
+}
+
+/* ══════════════════════════════════════
    UTILS
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
 const fmt        = (n) => 'RWF ' + Number(n).toLocaleString('en-RW', { minimumFractionDigits: 0 });
 const today      = () => new Date().toISOString().split('T')[0];
 const monthStart = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`; };
@@ -1361,6 +1393,7 @@ function submitSale() {
       s.product_id = pid; s.product_name = prod.name; s.client_name = client;
       s.client_tel = tel; s.serial_number = serial; s.buyer_nid = nid;
       s.price = price; s.status = status; s.sale_date = date;
+      saveDB();
       toast('Sale updated successfully');
     }
   } else {
@@ -1369,6 +1402,7 @@ function submitSale() {
       client_name: client, client_tel: tel, serial_number: serial, buyer_nid: nid,
       price, status, sale_date: date });
     prod.quantity--;
+    saveDB();
     toast('Sale added successfully');
   }
   closeModal('saleModal');
@@ -1383,6 +1417,7 @@ function deleteSale(id) {
       const p = DB.products.find(x => x.id === s.product_id);
       if (p) p.quantity++;
       DB.recyclebin.push({ id: DB._nextRecycleId++, type: 'sale', item_id: s.id, deleted_at: today(), ...s });
+      saveDB();
       toast('Sale moved to recycle bin');
       renderSales();
     }
@@ -1474,9 +1509,11 @@ function submitProduct() {
   if (editId) {
     const p = DB.products.find(x => x.id === parseInt(editId));
     if (p) { p.name = name; p.category = cat; p.price = price; p.quantity = qty; p.serial_prefix = serial; }
+    saveDB();
     toast('Product updated successfully');
   } else {
     DB.products.push({ id: DB._nextProductId++, name, category: cat, price, quantity: qty, serial_prefix: serial, created_at: today() });
+    saveDB();
     toast('Product added successfully');
   }
   document.getElementById('editProductId').value         = '';
@@ -1491,6 +1528,7 @@ function deleteProduct(id) {
     if (idx > -1) {
       const p = DB.products.splice(idx, 1)[0];
       DB.recyclebin.push({ id: DB._nextRecycleId++, type: 'product', item_id: p.id, deleted_at: today(), ...p });
+      saveDB();
       toast('Product moved to recycle bin');
       renderStock();
     }
@@ -1584,9 +1622,11 @@ function submitBuy() {
   if (editId) {
     const b = DB.buys.find(x => x.id === parseInt(editId));
     if (b) { b.buyer_name = name; b.buyer_phone = phone; b.buyer_nid = nid; b.product_name = product; b.serial_number = serial; b.price = price; b.buy_date = date; }
+    saveDB();
     toast('Buy record updated successfully');
   } else {
     DB.buys.push({ id: DB._nextBuyId++, buyer_name: name, buyer_nid: nid, buyer_phone: phone, product_name: product, serial_number: serial, price, buy_date: date });
+    saveDB();
     toast('Buy record added successfully');
   }
   document.getElementById('editBuyId').value          = '';
@@ -1601,6 +1641,7 @@ function deleteBuy(id) {
     if (idx > -1) {
       const b = DB.buys.splice(idx, 1)[0];
       DB.recyclebin.push({ id: DB._nextRecycleId++, type: 'buy', item_id: b.id, deleted_at: today(), ...b });
+      saveDB();
       toast('Buy moved to recycle bin');
       renderBuys();
     }
@@ -1730,18 +1771,11 @@ function restoreItem(id) {
       client_name: r.client_name, client_tel: r.client_tel, serial_number: r.serial_number,
       buyer_nid: r.buyer_nid, price: r.price, status: r.status, sale_date: r.sale_date });
     const p = DB.products.find(x => x.id === r.product_id);
-    if (p) p.quantity--;
-  } else if (r.type === 'product') {
-    DB.products.push({ id: r.item_id, name: r.name, category: r.category, price: r.price,
-      quantity: r.quantity, serial_prefix: r.serial_prefix, created_at: r.created_at });
-  } else if (r.type === 'buy') {
-    DB.buys.push({ id: r.item_id, buyer_name: r.buyer_name, buyer_nid: r.buyer_nid,
-      buyer_phone: r.buyer_phone, product_name: r.product_name, serial_number: r.serial_number,
-      price: r.price, buy_date: r.buy_date });
-  }
-
-  toast('Item restored successfully');
-  renderRecycle();
+      if (p) p.quantity--;
+    }
+    saveDB();
+    toast('Item restored successfully');
+    renderRecycle();
 }
 
 /* ══════════════════════════════════════
@@ -1762,6 +1796,9 @@ function downloadApp() {
    INIT
 ══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
+  // Load saved DB first
+  loadDB();
+
   // Overlay close on backdrop click
   document.querySelectorAll('.overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
