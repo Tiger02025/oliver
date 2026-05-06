@@ -191,6 +191,32 @@ main {
   padding: 1.5rem;
 }
 
+/* Desktop layout optimization */
+@media (min-width: 1024px) {
+  .container { padding: 2rem; }
+  .page-header { flex-direction: row; }
+  .page-subtitle { margin-top: 0; }
+  /* Make tables more readable on desktop */
+  table { font-size: 0.85rem; }
+  thead th { padding: 0.85rem 1.2rem; }
+  tbody td { padding: 0.9rem 1.2rem; }
+  .btn { padding: 0.6rem 1.2rem; }
+  .nav-link { padding: 0.5rem 1rem; }
+}
+
+/* Keyboard navigation focus visible */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Larger click targets on desktop */
+@media (min-width: 768px) {
+  .btn { min-height: 40px; }
+  .nav-link { padding: 0.55rem 1.1rem; }
+  .form-control { padding: 0.7rem 0.9rem; }
+}
+
 /* ─── PAGES ─── */
 .page { display: none; animation: fadeUp 0.25s ease both; }
 .page.active { display: block; }
@@ -297,6 +323,14 @@ main {
   gap: 0.8rem;
   align-items: flex-end;
   margin-bottom: 1rem;
+}
+@media (min-width: 768px) {
+  .filter-bar { flex-wrap: nowrap; gap: 1rem; }
+  .filter-group { min-width: 140px; }
+  .filter-group.flex-1 { min-width: 240px; flex: 1; }
+}
+@media (min-width: 1024px) {
+  .filter-group.flex-1 { min-width: 300px; }
 }
 .filter-group { display: flex; flex-direction: column; gap: 0.35rem; min-width: 130px; }
 .filter-group.flex-1 { flex: 1; min-width: 160px; }
@@ -452,11 +486,14 @@ select.form-control {
   border-radius: var(--radius-lg);
   padding: 1.8rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   box-shadow: var(--shadow-lg);
   animation: modalIn 0.22s ease both;
   position: relative;
   margin: auto;
+}
+@media (min-width: 768px) {
+  .modal { max-width: 560px; }
 }
 @keyframes modalIn {
   from { opacity: 0; transform: scale(0.96) translateY(20px); }
@@ -569,7 +606,8 @@ footer {
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--footer-h);
+  height: auto;
+  min-height: var(--footer-h);
   background: rgba(13,17,32,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -577,36 +615,31 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   z-index: 100;
-  padding: 0 1.5rem;
+  padding: 0.6rem 1rem;
   flex-wrap: wrap;
 }
-
-.footer-label {
-  font-size: 0.72rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  white-space: nowrap;
-}
-
 .download-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.55rem 1.25rem;
-  border-radius: 10px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 12px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   transition: all var(--transition);
   border: 2px solid var(--accent);
-  background: rgba(18,232,212,0.1);
+  background: rgba(18,232,212,0.12);
   color: var(--accent);
   white-space: nowrap;
+  min-height: 44px;
+  flex: 1;
+  max-width: 280px;
 }
 .download-btn:hover {
   color: var(--bg);
@@ -617,7 +650,7 @@ footer {
 .download-btn:active {
   transform: translateY(0);
 }
-.download-btn .btn-icon-img { font-size: 1.1rem; line-height: 1; }
+.download-btn .btn-icon-img { font-size: 1.15rem; line-height: 1; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
@@ -641,7 +674,7 @@ footer {
   .td-hide { display: none; }
   .stat-value { font-size: 1.3rem; }
   footer { gap: 0.6rem; padding: 0 0.8rem; }
-  .footer-label { display: none; }
+  .footer-label { font-size: 0.65rem; }
 }
 
 @media (max-width: 480px) {
@@ -650,7 +683,7 @@ footer {
   .period-pills { gap: 0.3rem; }
   .modal { padding: 1rem; }
   .confirm-box { padding: 1.5rem 1rem; }
-  .download-btn { font-size: 0.7rem; padding: 0.4rem 0.7rem; }
+  .download-btn { font-size: 0.8rem; padding: 0.65rem 1rem; min-height: 40px; flex: 1 1 auto; }
   .toast-container { right: 0.5rem; left: 0.5rem; }
   .toast { max-width: 100%; }
 }
@@ -726,42 +759,71 @@ footer {
 #ios-hint {
   display: none;
   background: var(--surface2);
-  border: 1px solid var(--accent);
+  border: 2px solid var(--accent);
   border-radius: var(--radius-lg);
-  padding: 1rem 1.4rem;
-  font-size: 0.8rem;
+  padding: 1.2rem 1.4rem;
+  font-size: 0.82rem;
   color: var(--text);
-  line-height: 1.7;
+  line-height: 1.8;
   position: fixed;
-  bottom: calc(var(--footer-h) + 0.6rem);
+  bottom: calc(var(--footer-h) + 1rem);
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 2rem);
-  max-width: 380px;
+  max-width: 420px;
   z-index: 800;
-  box-shadow: 0 8px 32px rgba(18,232,212,0.18);
-  animation: modalIn 0.3s ease both;
+  box-shadow: 0 12px 40px rgba(18,232,212,0.2), 0 0 0 100vmax rgba(8,12,20,0.8);
+  animation: modalIn 0.35s ease both;
 }
 #ios-hint.show { display: block; }
 #ios-hint .ios-title {
   font-family: var(--font-head);
   font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 0.6rem;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
   color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 #ios-hint .ios-close {
-  float: right;
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   cursor: pointer;
-  margin-top: -0.2rem;
+  padding: 0.1rem 0.3rem;
+  line-height: 1;
+  transition: color var(--transition);
 }
-#ios-hint ol { padding-left: 1.2rem; }
-#ios-hint li { margin-bottom: 0.3rem; }
-#ios-hint .ios-icon { font-size: 1.1rem; vertical-align: -0.1em; }
+#ios-hint .ios-close:hover { color: var(--text); }
+#ios-hint ol {
+  padding-left: 1.4rem;
+  margin: 0.8rem 0;
+}
+#ios-hint li {
+  margin-bottom: 0.5rem;
+}
+#ios-hint .ios-icon {
+  font-size: 1.2rem;
+  vertical-align: -0.15em;
+}
+#ios-hint .ios-note {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.6rem;
+}
+.ios-hint-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(8,12,20,0.6);
+  z-index: 799;
+}
+.ios-hint-overlay.show {
+  display: block;
+}
 
 /* Footer install btn */
 #footer-install-btn { display: none; }
@@ -769,6 +831,40 @@ footer {
 </style>
 </head>
 <body>
+<!-- Password gate overlay -->
+<div id="password-overlay" style="position:fixed;inset:0;background:rgba(8,12,20,0.98);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
+  <div style="text-align:center;color:var(--text);padding:2rem;border-radius:var(--radius-lg);background:var(--surface2);border:1px solid var(--accent);max-width:320px;width:90%;">
+    <div style="font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:0.5rem;">OLIX STOCK</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;">Enter password to access</div>
+    <input type="password" id="password-input" placeholder="Password" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:0.85rem;outline:none;text-align:center;">
+    <div style="color:var(--red);font-size:0.75rem;display:none;" id="password-error">Incorrect password</div>
+    <button onclick="checkPassword()" style="width:100%;margin-top:0.75rem;padding:0.7rem;border:none;border-radius:8px;background:var(--accent);color:var(--bg);font-family:var(--font-mono);font-size:0.85rem;font-weight:600;cursor:pointer;">Access</button>
+  </div>
+</div>
+<script>
+const PASSWORD_HASH = 'tiger.2//8'; // password required on every visit
+function checkPassword() {
+  const input = document.getElementById('password-input').value;
+  if (input === 'tiger.2//8') {
+    document.getElementById('password-overlay').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('password-error').style.display = 'block';
+    document.getElementById('password-input').value = '';
+    document.getElementById('password-input').focus();
+  }
+}
+document.getElementById('password-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkPassword();});
+function logout() {
+  document.getElementById('password-overlay').style.display = 'flex';
+  document.getElementById('logoutBtn').style.display = 'none';
+  toast('Logged out successfully', 'info');
+}
+// Clear any persisted auth and require password on every visit
+if(localStorage.getItem('olixAuth')==='true'){
+  localStorage.removeItem('olixAuth');
+}
+</script>
 
 <!-- ─── NAVBAR ─── -->
 <nav class="navbar">
@@ -780,7 +876,7 @@ footer {
     <button class="nav-link" data-page="report">Report</button>
   </div>
   <div class="nav-right">
-    <button class="btn btn-ghost btn-sm" onclick="toast('Logged out', 'info')">Logout</button>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -828,16 +924,18 @@ footer {
 </div>
 
 <!-- ─── iOS INSTALL HINT ─── -->
+<div class="ios-hint-overlay" id="ios-hint-overlay"></div>
 <div id="ios-hint">
   <div class="ios-title">
-    <button class="ios-close" onclick="document.getElementById('ios-hint').classList.remove('show')">×</button>
     Install on iPhone / iPad
+    <button class="ios-close" onclick="dismissIosHint()">×</button>
   </div>
   <ol>
     <li>Tap the <span class="ios-icon">⎋</span> <strong>Share</strong> button at the bottom of Safari</li>
     <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
     <li>Tap <strong>Add</strong> — the app icon will appear on your home screen</li>
   </ol>
+  <div class="ios-note">Once installed, open it from your home screen for full app experience.</div>
 </div>
 
 <!-- ─── MAIN ─── -->
@@ -1014,10 +1112,10 @@ footer {
 
 <!-- ─── FOOTER ─── -->
 <footer>
-  <button id="footer-install-btn" class="download-btn" onclick="triggerInstall()">
+  <button id="footer-install-btn" class="download-btn" onclick="showInstallUI()">
     <span class="btn-icon-img">📲</span> Download App
   </button>
-  <span class="footer-label" style="margin-left:auto;font-size:0.68rem;color:var(--muted);margin-right:auto">OLIX STOCK v1.0</span>
+  <span class="footer-label">OLIX STOCK v1.0</span>
 </footer>
 
 <!-- ─── MODALS ─── -->
@@ -1889,12 +1987,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.showInstallUI = function() {
     if (isIOS) {
+      document.getElementById('ios-hint-overlay').classList.add('show');
       document.getElementById('ios-hint').classList.add('show');
     } else if (deferredPrompt) {
       document.getElementById('install-banner').classList.add('show');
     } else {
       toast('Open this page in Chrome or Edge to install the app', 'info');
     }
+  };
+
+  window.dismissIosHint = function() {
+    document.getElementById('ios-hint-overlay').classList.remove('show');
+    document.getElementById('ios-hint').classList.remove('show');
   };
 
   window.triggerInstall = function() {
